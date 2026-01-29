@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Task Form View to add Sprint field -->
+    <record id="view_task_form_sprint" model="ir.ui.view">
+        <field name="name">project.task.form.sprint</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <field name="project_id" position="after">
+                <field name="sprint_id" domain="[('project_id', '=', project_id)]"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Inherit Task Tree View to add Sprint field -->
+    <record id="view_task_tree_sprint" model="ir.ui.view">
+        <field name="name">project.task.tree.sprint</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <field name="project_id" position="after">
+                <field name="sprint_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>
