@@ -1,9 +1,10 @@
 from odoo import models, fields, api
 
 class ProjectSprint(models.Model):
-    _name = 'project.sprint'
-    _description = 'Project Sprint'
-    _order = 'start_date desc'
+    #Odoo model attributes
+    _name = 'project.sprint'#creates table project_sprint, required
+    _description = 'Project Sprint' #shows in logs, good for docs
+    _order = 'start_date desc'#SQL: ORDER BY start_date DESC
 
     name = fields.Char(string='Sprint Name', required=True)
     project_id = fields.Many2one('project.project', string='Project', required=True, ondelete='cascade')
@@ -23,14 +24,14 @@ class ProjectSprint(models.Model):
         'sprint_task_add_rel',
         'sprint_id',
         'task_id',
-        string='Add Existing Tasks',
     )
 
-    @api.depends('task_ids')
+    @api.depends('task_ids')#mark as compute method, call each time task_ids changes
     def _compute_task_count(self):
         for sprint in self:
             sprint.task_count = len(sprint.task_ids)
 
+    #called when created
     @api.model_create_multi
     def create(self, vals_list):
         sprints = super().create(vals_list)
@@ -38,6 +39,8 @@ class ProjectSprint(models.Model):
         # sprints._validate_task_projects()  # Temporarily disabled for debugging
         return sprints
 
+    #Ensures tasks are assigned when they are selected from the picker.
+    #called when updated
     def write(self, vals):
         res = super().write(vals)
         if 'available_task_ids' in vals:
@@ -62,3 +65,15 @@ class ProjectSprint(models.Model):
                     'message': 'Remove all tasks first before changing the project.'
                 }
             }
+        
+    @api.constrains('task_ids', 'project_id')
+    def _check_task_projects(self):
+        """Ensure all tasks belong to the sprint's project."""
+        for sprint in self:
+            if sprint.task_ids:
+                wrong_tasks = sprint.task_ids.filtered(lambda t: t.project_id != sprint.project_id)
+                if wrong_tasks:
+                    raise models.ValidationError(
+                        f"All tasks must belong to project '{sprint.project_id.name}'. "
+                        f"Invalid tasks: {', '.join(wrong_tasks.mapped('name'))}"
+                    )    

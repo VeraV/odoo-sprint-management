@@ -44,20 +44,27 @@
                             <div invisible="project_id" class="alert alert-info mb-3">
                                 Select a project first to manage tasks.
                             </div>
-                            <group string="Click to pick tasks" invisible="not project_id">
+                            <group string="Add Tasks from Project" invisible="not project_id">
                                 <field name="available_task_ids"
-                                       widget="many2many_tags"
-                                       domain="[('project_id', '=', project_id), ('sprint_id', '=', False)]"
-                                       options="{'no_create': True}"/>
+                                    widget="many2many_tags"
+                                    placeholder="Click to select tasks from this project..."
+                                    domain="[('project_id', '=', project_id), ('sprint_id', '=', False)]"
+                                    options="{'no_create': True, 'no_open': True}"
+                                    invisible="not project_id"/>
                             </group>
                             <field name="task_ids"
-                                   invisible="not project_id"
-                                   context="{'default_project_id': project_id}">
-                                <list editable="bottom">
+                                readonly="1"
+                                invisible="not project_id"
+                                nolabel="1">
+                                <list create="0" delete="0">
                                     <field name="name"/>
-                                    <field name="project_id" readonly="1"/>
                                     <field name="user_ids" widget="many2many_tags"/>
                                     <field name="stage_id"/>
+                                    <button name="action_unassign_from_sprint" 
+                                        type="object" 
+                                        icon="fa-times" 
+                                        title="Remove from Sprint"
+                                        class="btn-link text-danger"/>
                                 </list>
                             </field>
                         </page>
