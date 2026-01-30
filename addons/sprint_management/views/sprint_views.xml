@@ -41,9 +41,21 @@
                     </group>
                     <notebook>
                         <page string="Tasks">
-                            <field name="task_ids">
-                                <list>
+                            <div invisible="project_id" class="alert alert-info mb-3">
+                                Select a project first to manage tasks.
+                            </div>
+                            <group string="Click to pick tasks" invisible="not project_id">
+                                <field name="available_task_ids"
+                                       widget="many2many_tags"
+                                       domain="[('project_id', '=', project_id), ('sprint_id', '=', False)]"
+                                       options="{'no_create': True}"/>
+                            </group>
+                            <field name="task_ids"
+                                   invisible="not project_id"
+                                   context="{'default_project_id': project_id}">
+                                <list editable="bottom">
                                     <field name="name"/>
+                                    <field name="project_id" readonly="1"/>
                                     <field name="user_ids" widget="many2many_tags"/>
                                     <field name="stage_id"/>
                                 </list>
